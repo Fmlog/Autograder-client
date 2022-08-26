@@ -24,6 +24,7 @@ function Login() {
 
         axios.post(baseUrl + "/api/login", userFormData).then((res) => {
             localStorage.setItem('userLoginStatus', "true");
+            window.location.href = "/";
         });
     };
 
