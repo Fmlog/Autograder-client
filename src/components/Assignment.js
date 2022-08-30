@@ -5,12 +5,12 @@ import AuthContext from "../context/AuthProvider";
 const baseUrl = "http://127.0.0.1:8000";
 const token = localStorage.getItem("accessToken");
 
-function Home() {
+function Assignment() {
   const userRef = useRef();
   const errRef = useRef();
 
-  const [name, setAssignment] = useState("");
-  const [description, setFile] = useState("");
+  const [name, setName] = useState("");
+  const [description, setDesc] = useState("");
   const [course_id, setCourse] = useState("");
 
   const [errMsg, setErrMsg] = useState("");
@@ -19,8 +19,6 @@ function Home() {
   const { setAuth } = useContext(AuthContext);
 
   const [test, setTest] = useState([]);
-
-  const [next, setNext] = useState([]);
   useEffect(() => {
     axios
       .get(baseUrl + "/api/course/", {
@@ -30,17 +28,6 @@ function Home() {
         setTest(response.data);
       });
   }, []);
-
-  const handleSelect = (e) => {
-    setCourse(e.target.value)
-      axios
-        .get(baseUrl + "/api/course/" + e.target.value + "/", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((response) => {
-          setNext(response.data);
-        });
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,10 +40,7 @@ function Home() {
           course_id: course_id,
         }),
         {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           withCredentials: true,
         }
       );
@@ -65,8 +49,8 @@ function Home() {
       const roles = response?.data?.roles;
 
       setAuth({ name: name, description: description, roles, accessToken });
-      setAssignment("");
-      setFile("");
+      setName("");
+      setDesc("");
       setCourse("");
       setSuccess(true);
     } catch (err) {
@@ -93,18 +77,17 @@ function Home() {
         </section>
       ) : (
         <section>
-          <p
-            class="text-success"
+          <p class="text-success"
             ref={errRef}
             className={errMsg ? "errmsg" : "offscreen"}
             aria-live="assertive"
           >
             {errMsg}
           </p>
-          <h1 className="container p-4">Submit your Assignment</h1>
+          <h1 className="container p-4">Create Assignment</h1>
           <form className="container p-4" onSubmit={handleSubmit}>
             <select
-              onChange={handleSelect}
+              onChange={(e) => setCourse(e.target.value)}
               name="assignment_id"
               class="form-select form-select-lg mb-3"
               aria-label=".form-select-lg example"
@@ -114,35 +97,34 @@ function Home() {
                 <option value={item.id}>{item.name}</option>
               ))}
             </select>
-            <select
-              onChange={(e) => setAssignment(e.target.value)}
-              name="assignment_id"
-              class="form-select form-select-lg mb-3"
-              aria-label=".form-select-lg example"
-            >
-              <option selected>Select Assignment</option>
-              {next.map((ass) => (
-                <option value={ass.id}>{ass.name}</option>
-              ))}
-            </select>
-
-            <label for="formFileLg" className="form-label mt-4">
-              Upload your assignment submission
+            <label className="mt-3" htmlFor="name">
+              Assignment Name:
             </label>
             <input
-              onChange={(e) => setFile(e.target.value)}
-              className="form-control form-control-lg w-50 "
-              id="formFileLg"
-              type="file"
+              type="text"
+              id="name"
+              ref={userRef}
+              className="form-control mt-2"
+              autoComplete="off"
+              onChange={(e) => setName(e.target.value)}
+              value={name}
+              required
             />
-            <button className="btn btn-primary mt-4 btn-lg">
-              Submit Assignment
-            </button>
+            <label className="mt-3" htmlFor="password">
+              Assignment description:
+            </label>
+            <textarea
+              id="password"
+              className="form-control mt-2"
+              onChange={(e) => setDesc(e.target.value)}
+              value={description}
+              required
+            />
+            <button className="btn btn-primary mt-4">Create Assignment</button>
           </form>
         </section>
       )}
     </>
   );
 }
-
-export default Home;
+export default Assignment;

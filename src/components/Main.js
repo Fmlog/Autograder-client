@@ -1,11 +1,11 @@
 import Home from './Home'
 import Login from './Login'
 import Register from './Register'
-import Submit from './Submit'
 import Header from './Header'
 import Result from './Result'
-import Question from './Question'
+import Assignment from './Assignment'
 import Test from './Test'
+import Logout from './Logout'
 
 
 import { Routes, Route } from 'react-router-dom'
@@ -17,10 +17,10 @@ function Main() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/logout" element={<Logout />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/submit" element={<Submit />} />
                 <Route path="/result" element={<Result />} />
-                <Route path="/question" element={<Question />} />
+                <Route path="/assignment" element={<Assignment />} />
                 <Route path="/test" element={<Test />} />
 
             </Routes>

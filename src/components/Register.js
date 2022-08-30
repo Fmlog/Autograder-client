@@ -27,6 +27,7 @@ function Register() {
 
         axios.post(baseUrl + "/api/register/lecturer", userFormData).then((res) => {
             localStorage.setItem('userLoginStatus', "true");
+            window.location.href = "/";
         });
     };
     const userLoginStatus = localStorage.getItem("userLoginStatus");
@@ -37,7 +38,7 @@ function Register() {
         document.title = "Login";
     });
     return (
-        <form className="p-4">
+        <form className="container p-4">
             {userData.status === "success" && (
                 <p class="text-success">Registeration successful</p>
             )}
