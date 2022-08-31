@@ -6,67 +6,65 @@ const baseUrl = "http://127.0.0.1:8000";
 const token = localStorage.getItem("accessToken");
 
 function Home() {
-  const userRef = useRef();
   const errRef = useRef();
 
-  const [name, setAssignment] = useState("");
-  const [description, setFile] = useState("");
-  const [course_id, setCourse] = useState("");
+  const [results, setResults] = useState("");
+
+  const printed = JSON.stringify(results)
 
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const { setAuth } = useContext(AuthContext);
 
-  const [test, setTest] = useState([]);
 
-  const [next, setNext] = useState([]);
+  const [course, setCourse] = useState([]);
+  const [assignmentList, setAssignmentList] = useState([]);
+  const [assignment, setAssignment] = useState([]);
+
+  const [selectedFile, setSelectedFile] = useState(null);
+
+
+	const changeHandler = (event) => {
+		setSelectedFile(event.target.files[0]);
+	};
+
   useEffect(() => {
     axios
       .get(baseUrl + "/api/course/", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        setTest(response.data);
+        setCourse(response.data);
       });
   }, []);
 
   const handleSelect = (e) => {
-    setCourse(e.target.value)
       axios
         .get(baseUrl + "/api/course/" + e.target.value + "/", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
-          setNext(response.data);
+          setAssignmentList(response.data);
         });
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("assignment_id", assignment);
     try {
-      const response = await axios.post(
-        baseUrl + "/api/course/assignment/",
-        JSON.stringify({
-          name: name,
-          description: description,
-          course_id: course_id,
-        }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        }
-      );
-      const accessToken = response?.data?.token?.access_token;
-      localStorage.setItem("accessToken", accessToken);
-      const roles = response?.data?.roles;
-
-      setAuth({ name: name, description: description, roles, accessToken });
-      setAssignment("");
-      setFile("");
+      const response = await axios({
+        method: "post",
+        url: baseUrl + "/api/course/submission",
+        data: formData,
+        headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
+      setResults(response.data);
+      const printed = JSON.stringify(response.data)
+      setAssignmentList("");
+      setSelectedFile(null);
       setCourse("");
       setSuccess(true);
     } catch (err) {
@@ -77,7 +75,7 @@ function Home() {
       } else if (err.response?.status === 401) {
         setErrMsg("Unauthorized");
       } else {
-        setErrMsg("Assignment Creation Failed");
+        setErrMsg("Submission Failed");
       }
       errRef.current.focus();
     }
@@ -87,9 +85,14 @@ function Home() {
     <>
       {success ? (
         <section>
-          <h1 class="text-success p-4">Assignment Created</h1>
+          <h1 class="text-success p-4">Submission Successful! </h1>
           <br />
-          <p>{/* <a href="#">Go to Home</a> */}</p>
+          {printed}
+          {/*results.map((item) =>(
+          <h3>
+            {item.result}
+          </h3>
+          ))*/}
         </section>
       ) : (
         <section>
@@ -110,7 +113,7 @@ function Home() {
               aria-label=".form-select-lg example"
             >
               <option selected>Select Course</option>
-              {test.map((item) => (
+              {course.map((item) => (
                 <option value={item.id}>{item.name}</option>
               ))}
             </select>
@@ -121,7 +124,7 @@ function Home() {
               aria-label=".form-select-lg example"
             >
               <option selected>Select Assignment</option>
-              {next.map((ass) => (
+              {assignmentList.map((ass) => (
                 <option value={ass.id}>{ass.name}</option>
               ))}
             </select>
@@ -130,7 +133,7 @@ function Home() {
               Upload your assignment submission
             </label>
             <input
-              onChange={(e) => setFile(e.target.value)}
+              onChange={changeHandler}
               className="form-control form-control-lg w-50 "
               id="formFileLg"
               type="file"
