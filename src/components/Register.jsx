@@ -8,12 +8,18 @@ function Register() {
 
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
+  //const [selected, setSelected] = useState(options[0].value);
+
+  useEffect(() => {
+    setErrMsg("");
+  }, []);
+  
 
   const [userData, setUserData] = useState({
     name: "",
     login_id: "",
     password: "",
-    is_lecturer: "True",
+    role: "",
   });
   const handleChange = (event) => {
     setUserData({
@@ -21,13 +27,13 @@ function Register() {
       [event.target.name]: event.target.value,
     });
   };
-
+  
   const submitForm = async () => {
     const userFormData = new FormData();
     userFormData.append("name", userData.name);
     userFormData.append("login_id", userData.login_id);
     userFormData.append("password", userData.password);
-    userFormData.append("is_lecturer", userData.is_lecturer);
+    userFormData.append("role", userData.role);
     try {
       const response = await axios.post(
         baseUrl + "/api/register/lecturer",
@@ -37,13 +43,13 @@ function Register() {
         }
       );
       console.log(response);
-      setSuccess(true)
-    } catch (err) {
-      if (!err?.response) {
+      setSuccess(true);
+    } catch (error) {
+      if (!error?.response) {
         setErrMsg("No Server Response");
-      } else if (err.response?.status === 400) {
+      } else if (error.response?.status === 400) {
         setErrMsg("Missing Fields)");
-      } else if (err.response?.status === 401) {
+      } else if (error.response?.status === 401) {
         setErrMsg("Unauthorized");
       } else {
         setErrMsg("Submission Failed");
@@ -53,7 +59,7 @@ function Register() {
   };
 
   useEffect(() => {
-    document.title = "Login";
+    document.title = "Register";
   });
   return (
     <div>
@@ -63,74 +69,98 @@ function Register() {
           <br />
           <p>
             <a href="/">Go to Home</a>
-            {window.location.href = "/"}
+            {(window.location.href = "/")}
           </p>
-          
         </section>
       ) : (
-        <form className="container p-4">
+        <section>
           <p
             ref={errRef}
-            className={errMsg ? "errmsg" : "offscreen"}
+            className={errMsg ? "errmsg" : "offcanvas"}
             aria-live="assertive"
           >
             {errMsg}
           </p>
-          <div className="mb-3">
-            <label for="name" className="form-label">
-              name
-            </label>
-            <input
-              value={userData.name}
-              onChange={handleChange}
-              name="name"
-              type="text"
-              className="form-control"
-              id="name"
-              aria-describedby="emailHelp"
-            />
-            <div id="emailHelp" className="form-text">
-              Full Name not required
+          <h1 className="container p-4">Register</h1>
+          <form className="container p-4">
+            <div className="mb-3">
+              <label for="name" className="form-label">
+                Name
+              </label>
+              <input
+                value={userData.name}
+                onChange={handleChange}
+                name="name"
+                type="text"
+                className="form-control"
+                id="name"
+                aria-describedby="emailHelp"
+              />
+              <div id="emailHelp" className="form-text">
+                Full Name not required
+              </div>
             </div>
-          </div>
-          <div className="mb-3">
-            <label for="email" className="form-label">
-              Email/Login Id
-            </label>
-            <input
-              value={userData.login_id}
-              onChange={handleChange}
-              name="login_id"
-              type="email"
-              className="form-control"
-              id="email"
-              aria-describedby="emailHelp"
-            />
-            <div id="emailHelp" className="form-text">
-              Authenticate with your LMS instead
+            <div className="mb-3">
+              <label for="email" className="form-label">
+                Email/Login Id
+              </label>
+              <input
+                value={userData.login_id}
+                onChange={handleChange}
+                name="login_id"
+                type="email"
+                className="form-control"
+                id="email"
+                aria-describedby="emailHelp"
+              />
+              <div id="emailHelp" className="form-text">
+                Authenticate with your LMS instead
+              </div>
             </div>
-          </div>
-          <div className="mb-3">
-            <label for="password" className="form-label">
-              Password
-            </label>
-            <input
-              value={userData.password}
+            <div className="mb-3">
+              <label for="password" className="form-label">
+                Password
+              </label>
+              <input
+                value={userData.password}
+                onChange={handleChange}
+                name="password"
+                type="password"
+                className="form-control"
+                id="password"
+              />
+            </div>
+            <div className="mb-3">
+              <label for="password" className="form-label">
+                Role
+              </label>
+              <select
               onChange={handleChange}
-              name="password"
-              type="password"
-              className="form-control"
-              id="password"
-            />
-          </div>
-          <button
-            onClick={submitForm}
-            type="submit"
-            className="btn btn-primary mt-4"
-          >
-            Register
-          </button>
-        </form>
+              value={userData.role}
+              name="role"
+              class="form-select form-select mb-3"
+              aria-label=".form-select example"
+            >
+              <option selected>Select role</option>
+              <option key="teacher" value="2">teacher</option>
+              <option key="student" value="3">student</option>
+            </select>
+            </div>
+            <button
+              onClick={submitForm}
+              type="submit"
+              className="btn btn-primary mt-4"
+            >
+              Register
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary mt-4 ms-4"
+            >
+              Sign up with your LMS
+            </button>
+          </form>
+        </section>
       )}
     </div>
   );

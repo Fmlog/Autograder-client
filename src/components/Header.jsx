@@ -2,18 +2,18 @@ import { Link } from "react-router-dom";
 
 function Header() {
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div className="container-fluid">
+    <div className="">
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <div className="container">
           <Link className="navbar-brand" to="/login">
-            Autograder
+            <h3>Autograder</h3>
           </Link>
           <button
             className="navbar-toggler"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target="#navbarNavAltMarkup"
-            aria-controls="navbarNavAltMarkup"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
             aria-expanded="false"
             aria-label="Toggle navigation"
           >
@@ -24,12 +24,6 @@ function Header() {
               <Link to="/" className="nav-link" aria-current="page">
                 Home
               </Link>
-              <a className="nav-link" href="/#">
-                Dashboard
-              </a>
-              <a className="nav-link" href="/#">
-                API Endpoints
-              </a>
               <Link className="nav-link" to="/login">
                 Login
               </Link>
@@ -59,6 +53,11 @@ function Header() {
                     </Link>
                   </li>
                   <li>
+                    <Link className="dropdown-item" to="/dashboard">
+                      Dashboard
+                    </Link>
+                  </li>
+                  <li>
                     <Link className="dropdown-item" to="/assignment">
                       Create Assignment
                     </Link>
@@ -73,8 +72,8 @@ function Header() {
             </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </div>
   );
 }
 

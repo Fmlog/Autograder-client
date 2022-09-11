@@ -36,12 +36,12 @@ const Login = () => {
       setUser("");
       setPwd("");
       setSuccess(true);
-    } catch (err) {
-      if (!err?.response) {
+    } catch (error) {
+      if (!error?.response) {
         setErrMsg("No Server Response");
-      } else if (err.response?.status === 400) {
+      } else if (error.response?.status === 400) {
         setErrMsg("Missing Username or Password");
-      } else if (err.response?.status === 401) {
+      } else if (error.response?.status === 401) {
         setErrMsg("Unauthorized");
       } else {
         setErrMsg("Login Failed");
@@ -66,7 +66,7 @@ const Login = () => {
           >
             {errMsg}
           </p>
-          <h1 className="container p-4" >Sign In</h1>
+          <h1 className="container p-4" >Log In</h1>
           <form className="container p-4" onSubmit={handleSubmit}>
             <label htmlFor="username">Username:</label>
             <input

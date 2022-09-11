@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useRef, useEffect, useState, useContext } from "react";
 import AuthContext from "../context/AuthProvider";
+import { Link } from "react-router-dom";
+
 
 const baseUrl = "http://127.0.0.1:8000";
 const token = localStorage.getItem("accessToken");
@@ -62,7 +64,6 @@ function Home() {
         withCredentials: true,
       });
       setResults(response.data);
-      const printed = JSON.stringify(response.data)
       setAssignmentList("");
       setSelectedFile(null);
       setCourse("");
@@ -88,6 +89,9 @@ function Home() {
           <h1 class="text-success p-4">Submission Successful! </h1>
           <br />
           {printed}
+          <div className= "mt-4">
+				<Link to='/submit'><button type="button" className="btn btn-primary btn-lg">Submit again</button></Link>
+			</div>
           {/*results.map((item) =>(
           <h3>
             {item.result}
@@ -114,7 +118,7 @@ function Home() {
             >
               <option selected>Select Course</option>
               {course.map((item) => (
-                <option value={item.id}>{item.name}</option>
+                <option value={item.id}>[{item.course_code}] {item.name}</option>
               ))}
             </select>
             <select
