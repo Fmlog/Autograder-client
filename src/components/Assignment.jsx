@@ -4,7 +4,9 @@ import AuthContext from "../context/AuthProvider";
 
 const baseUrl = "http://127.0.0.1:8000";
 const token = localStorage.getItem("accessToken");
-
+/** This component creates a new assignment and sends
+ * it ass
+ */
 function Assignment() {
   const userRef = useRef();
   const errRef = useRef();
@@ -16,6 +18,7 @@ function Assignment() {
   const [course_id, setCourse] = useState("");
   const [courseList, setCourseList] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState(null);
+  const [configFile, setConfigFile] = useState(null);
 
   useEffect(() => {
     axios
@@ -26,8 +29,13 @@ function Assignment() {
         setCourseList(response.data);
       });
   }, []);
-  const changeHandler = (event) => {
-    setSelectedFiles(event.target.files[0]);
+
+  const handleTestcaseUpload = (event) => {
+    setSelectedFiles(event.target.files);
+  };
+
+  const handleConfigUpload = (event) => {
+    setConfigFile(event.target.files[0]);
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,9 +43,10 @@ function Assignment() {
     formData.append("name", name);
     formData.append("description", description);
     formData.append("course_id", course_id);
-    for (const file of selectedFiles) {
-      formData.append("file", file);
-    };
+    for (let i = 0; i < selectedFiles.length; i++) {
+      formData.append("testcase", selectedFiles[i]);
+    }
+    formData.append("config", configFile);
 
     try {
       const response = await axios({
@@ -50,11 +59,11 @@ function Assignment() {
         },
         withCredentials: true,
       });
+
       const accessToken = response?.data?.token?.access_token;
       localStorage.setItem("accessToken", accessToken);
-      const roles = response?.data?.roles;
 
-      setAuth({ name: name, description: description, roles, accessToken });
+      setAuth({ name: name, description: description, accessToken });
       setName("");
       setDesc("");
       setCourse("");
@@ -79,7 +88,7 @@ function Assignment() {
         <section>
           <h1 class="text-success p-4">Assignment Created</h1>
           <br />
-          <p>{/* <a href="#">Go to Home</a> */}</p>
+          <p>{<a href="/dashboard">Go to Home</a>}</p>
         </section>
       ) : (
         <section>
@@ -92,7 +101,11 @@ function Assignment() {
             {errMsg}
           </p>
           <h1 className="container p-4">Create Assignment</h1>
-          <form className="container p-4" onSubmit={handleSubmit}>
+          <form
+            className="container p-4"
+            onSubmit={handleSubmit}
+            encType="multipart/form-data"
+          >
             <select
               onChange={(e) => setCourse(e.target.value)}
               name="assignment_id"
@@ -133,7 +146,17 @@ function Assignment() {
               Add testcase files
             </label>
             <input
-              onChange={changeHandler}
+              onChange={handleTestcaseUpload}
+              className="form-control form-control-lg w-50 "
+              id="formFileLg"
+              type="file"
+              multiple
+            />
+            <label for="formFileLg" className="form-label mt-4">
+              Add Config file
+            </label>
+            <input
+              onChange={handleConfigUpload}
               className="form-control form-control-lg w-50 "
               id="formFileLg"
               type="file"

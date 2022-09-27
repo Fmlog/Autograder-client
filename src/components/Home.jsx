@@ -3,36 +3,32 @@ import { useRef, useEffect, useState, useContext } from "react";
 import AuthContext from "../context/AuthProvider";
 import { Link } from "react-router-dom";
 
-
-const baseUrl = "http://127.0.0.1:8000";
+const graderUrl = "http://127.0.0.1:8000/api";
+const LMSUrl = "http://127.0.0.1:7000/api";
 const token = localStorage.getItem("accessToken");
 
+/** This component renders the submission page.
+  * The submission information is fetched from autograder's server.
+  * On successful grading the submission grade is sent to the LMS's server
+  */
 function Home() {
   const errRef = useRef();
 
-  const [results, setResults] = useState("");
-
-  const printed = JSON.stringify(results)
-
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
-
-
-
   const [course, setCourse] = useState([]);
   const [assignmentList, setAssignmentList] = useState([]);
   const [assignment, setAssignment] = useState([]);
-
   const [selectedFile, setSelectedFile] = useState(null);
+  const [response, setResponse] = useState({});
+  const [results, setResults] = useState({});
 
 
-	const changeHandler = (event) => {
-		setSelectedFile(event.target.files[0]);
-	};
 
+  /** Populates the DOM with courses on load */
   useEffect(() => {
     axios
-      .get(baseUrl + "/api/course/", {
+      .get(graderUrl + "/course/", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -40,34 +36,68 @@ function Home() {
       });
   }, []);
 
-  const handleSelect = (e) => {
-      axios
-        .get(baseUrl + "/api/course/" + e.target.value + "/", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((response) => {
-          setAssignmentList(response.data);
-        });
-  }
+  /** Stores submission file from input*/
+  const handleUpload = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
 
+  /** Gets assignment from selected course */
+  const handleSelect = (e) => {
+    axios
+      .get(graderUrl + "/course/" + e.target.value + "/", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        setAssignmentList(response.data);
+      });
+  };
+
+  /** Post submission request to the autograder.
+    * Then Post the response (grade) to the sublogger i.e. LMS 
+    */
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("assignment_id", assignment);
     try {
+      //Request to autograder
       const response = await axios({
         method: "post",
-        url: baseUrl + "/api/course/submission",
+        url: graderUrl + "/course/submission",
         data: formData,
-        headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
         withCredentials: true,
       });
-      setResults(response.data);
-      setAssignmentList("");
+      setResults(response.data.result);
+      setResponse(response.data)
+      setAssignmentList([]);
       setSelectedFile(null);
-      setCourse("");
+      setCourse([]);
       setSuccess(true);
+
+      // Submission grade
+      const subData = new FormData();
+      subData.append("assignment_id", assignment);
+      subData.append("user_id", response.data.user_id);
+      subData.append("posted_grade", response.data.grade);
+      subData.append("comment", JSON.stringify(response.data.result));
+      console.log(results.user_id);
+      try {
+        //Request to LMS (sublogger)
+        const second = await axios({
+          method: "post",
+          url: LMSUrl + "/sublogger/",
+          data: subData,
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        console.log(second);
+      } catch (err) {
+        console.log(err);
+      }
     } catch (err) {
       if (!err?.response) {
         setErrMsg("No Server Response");
@@ -81,22 +111,34 @@ function Home() {
       errRef.current.focus();
     }
   };
-
+  const refreshPage = () => {
+    window.location.reload();
+  };
   return (
     <>
       {success ? (
-        <section>
-          <h1 class="text-success p-4">Submission Successful! </h1>
+        <section className="container mt-4 p-4">
+          <h1 class="text-success">Submission Successful! </h1>
           <br />
-          {printed}
-          <div className= "mt-4">
-				<Link to='/submit'><button type="button" className="btn btn-primary btn-lg">Submit again</button></Link>
-			</div>
-          {/*results.map((item) =>(
-          <h3>
-            {item.result}
-          </h3>
-          ))*/}
+          <h3>Grade: {response.grade}</h3>
+          <ul className="list-group">
+            {results.map((result) => (
+              <li className="list-group-item">
+                <div><strong>Testcase:</strong> {result.name}</div>
+                <div><strong>Weight:</strong> {result.weight}</div>
+                <div><strong>Grade:</strong> {result.grade}</div>
+                <div><strong>Message:</strong> <pre>{result.message}</pre></div>
+                <div><strong>Extra outputs:</strong> {}</div>
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            onClick={refreshPage}
+            className="btn btn-primary btn-lg mt-4"
+          >
+            Submit again
+          </button>
         </section>
       ) : (
         <section>
@@ -118,7 +160,9 @@ function Home() {
             >
               <option selected>Select Course</option>
               {course.map((item) => (
-                <option value={item.id}>[{item.course_code}] {item.name}</option>
+                <option value={item.id}>
+                  [{item.course_code}] {item.name}
+                </option>
               ))}
             </select>
             <select
@@ -137,7 +181,7 @@ function Home() {
               Upload your assignment submission
             </label>
             <input
-              onChange={changeHandler}
+              onChange={handleUpload}
               className="form-control form-control-lg w-50 "
               id="formFileLg"
               type="file"

@@ -1,24 +1,28 @@
 import axios from "../api/axios";
-import { useRef, useEffect, useState, useContext } from "react";
-import AuthContext from "../context/AuthProvider";
+import { useRef, useEffect, useState } from "react";
 
 const baseUrl = "http://127.0.0.1:8000/api/login";
 
-const Login = () => {
+/** Component for user authentication. 
+ * POST user data to the autograder's server and stores 
+ * bearer token on the client for subsequent requests */
+function Login() {
   const userRef = useRef();
   const errRef = useRef();
   const [login_id, setUser] = useState("");
   const [password, setPwd] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
-  useEffect(() => {
-    userRef.current.focus();
-  }, []);
+
+  /** Sets error message on load */
   useEffect(() => {
     setErrMsg("");
   }, [login_id, password]);
-  const { setAuth } = useContext(AuthContext);
-  const handleSubmit = async (e) => {
+  
+  /** Post user input to server.
+   * Called on click of sign in button.
+   */
+  const handleSignIn = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post(
@@ -30,9 +34,7 @@ const Login = () => {
         }
       );
       const accessToken = response?.data?.token?.access_token;
-      localStorage.setItem('accessToken', accessToken);
-      const roles = response?.data?.roles;
-      setAuth({ login_id: login_id, password: password, roles, accessToken });
+      localStorage.setItem("accessToken", accessToken);
       setUser("");
       setPwd("");
       setSuccess(true);
@@ -46,7 +48,6 @@ const Login = () => {
       } else {
         setErrMsg("Login Failed");
       }
-      errRef.current.focus();
     }
   };
   return (
@@ -58,7 +59,7 @@ const Login = () => {
           <p>{/* <a href="#">Go to Home</a> */}</p>
         </section>
       ) : (
-        <section>
+        <section className="container p-4">
           <p
             ref={errRef}
             className={errMsg ? "errmsg" : "offscreen"}
@@ -66,37 +67,46 @@ const Login = () => {
           >
             {errMsg}
           </p>
-          <h1 className="container p-4" >Log In</h1>
-          <form className="container p-4" onSubmit={handleSubmit}>
-            <label htmlFor="username">Username:</label>
-            <input
-              type="text"
-              id="username"
-              ref={userRef}
-              className="form-control"
-              autoComplete="off"
-              onChange={(e) => setUser(e.target.value)}
-              value={login_id}
-              required
-            />
-            <label htmlFor="password">Password:</label>
-            <input
-              type="password"
-              id="password"
-              className="form-control"
-              onChange={(e) => setPwd(e.target.value)}
-              value={password}
-              required
-            />
-            <button className="btn btn-primary mt-4" >Sign In</button>
+
+          <form className="p-4" onSubmit={handleSignIn}>
+            <h1 class="mb-4">Log In</h1>
+            <div className="mt-3">
+              <label for="username" class="form-label">
+                Login ID/Email
+              </label>
+              <input
+                type="text"
+                id="username"
+                ref={userRef}
+                className="form-control"
+                autoComplete="off"
+                onChange={(e) => setUser(e.target.value)}
+                value={login_id}
+                required
+              />
+            </div>
+            <div className="mt-3">
+              <label for="password" class="form-label">
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                className="form-control"
+                onChange={(e) => setPwd(e.target.value)}
+                value={password}
+                required
+              />
+            </div>
+            <button className="btn btn-primary btn-lg mt-4">Sign In</button>
+            <p className="mt-4">
+              Need an Account?
+              <br />
+              <span className="line">
+                <a href="/register">Register</a>
+              </span>
+            </p>
           </form>
-          <p className="container p-4">
-            Need an Account?
-            <br />
-            <span className="line">
-              <a href="/#">Sign Up</a>
-            </span>
-          </p>
         </section>
       )}
     </>

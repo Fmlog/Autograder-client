@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState, useRef } from "react";
 
-const baseUrl = "http://127.0.0.1:8000";
+const baseUrl = "http://127.0.0.1:8000/api/register";
 
 function Register() {
   const errRef = useRef();
@@ -36,7 +36,7 @@ function Register() {
     userFormData.append("role", userData.role);
     try {
       const response = await axios.post(
-        baseUrl + "/api/register/lecturer",
+        baseUrl ,
         userFormData,
         {
           headers: { "Content-Type": "application/json" },
@@ -64,7 +64,7 @@ function Register() {
   return (
     <div>
       {success ? (
-        <section>
+        <section className="container p-4">
           <h1 class="text-success p-4">You are logged in!</h1>
           <br />
           <p>
@@ -73,7 +73,7 @@ function Register() {
           </p>
         </section>
       ) : (
-        <section>
+        <section className="container p-4">
           <p
             ref={errRef}
             className={errMsg ? "errmsg" : "offcanvas"}
@@ -81,8 +81,8 @@ function Register() {
           >
             {errMsg}
           </p>
-          <h1 className="container p-4">Register</h1>
-          <form className="container p-4">
+          <form className="p-4">
+          <h1 class="mb-4">Register</h1>
             <div className="mb-3">
               <label for="name" className="form-label">
                 Name
@@ -142,8 +142,8 @@ function Register() {
               aria-label=".form-select example"
             >
               <option selected>Select role</option>
-              <option key="teacher" value="2">teacher</option>
-              <option key="student" value="3">student</option>
+              <option key="teacher" value="2">Teacher</option>
+              <option key="student" value="3">Student</option>
             </select>
             </div>
             <button
