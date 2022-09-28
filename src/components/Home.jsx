@@ -1,17 +1,17 @@
 import axios from "axios";
-import { useRef, useEffect, useState, useContext } from "react";
-import AuthContext from "../context/AuthProvider";
-import { Link } from "react-router-dom";
+import { useRef, useEffect, useState } from "react";
 
 const graderUrl = "http://127.0.0.1:8000/api";
 const LMSUrl = "http://127.0.0.1:7000/api";
 const token = localStorage.getItem("accessToken");
 
 /** This component renders the submission page.
-  * The submission information is fetched from autograder's server.
-  * On successful grading the submission grade is sent to the LMS's server
-  */
+ * The submission information is fetched from autograder's server.
+ * On successful grading the submission grade is sent to the LMS's server
+ */
 function Home() {
+  document.title = "Home";
+
   const errRef = useRef();
 
   const [errMsg, setErrMsg] = useState("");
@@ -22,8 +22,6 @@ function Home() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [response, setResponse] = useState({});
   const [results, setResults] = useState({});
-
-
 
   /** Populates the DOM with courses on load */
   useEffect(() => {
@@ -53,8 +51,8 @@ function Home() {
   };
 
   /** Post submission request to the autograder.
-    * Then Post the response (grade) to the sublogger i.e. LMS 
-    */
+   * Then Post the response (grade) to the sublogger i.e. LMS
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -73,7 +71,7 @@ function Home() {
         withCredentials: true,
       });
       setResults(response.data.result);
-      setResponse(response.data)
+      setResponse(response.data);
       setAssignmentList([]);
       setSelectedFile(null);
       setCourse([]);
@@ -124,19 +122,25 @@ function Home() {
           <ul className="list-group">
             {results.map((result) => (
               <li className="list-group-item">
-                <div><strong>Testcase:</strong> {result.name}</div>
-                <div><strong>Weight:</strong> {result.weight}</div>
-                <div><strong>Grade:</strong> {result.grade}</div>
-                <div><strong>Message:</strong> <pre>{result.message}</pre></div>
-                <div><strong>Extra outputs:</strong> {}</div>
+                <div>
+                  <strong>Testcase:</strong> {result.name}
+                </div>
+                <div>
+                  <strong>Weight:</strong> {result.weight}
+                </div>
+                <div>
+                  <strong>Grade:</strong> {result.grade}
+                </div>
+                <div>
+                  <strong>Message:</strong> <pre>{result.message}</pre>
+                </div>
+                <div>
+                  <strong>Extra outputs:</strong> {}
+                </div>
               </li>
             ))}
           </ul>
-          <button
-            type="button"
-            onClick={refreshPage}
-            className="btn btn-primary btn-lg mt-4"
-          >
+          <button type="button" onClick={refreshPage} className="btn btn-primary btn-lg mt-4">
             Submit again
           </button>
         </section>
@@ -186,9 +190,7 @@ function Home() {
               id="formFileLg"
               type="file"
             />
-            <button className="btn btn-primary mt-4 btn-lg">
-              Submit Assignment
-            </button>
+            <button className="btn btn-primary mt-4 btn-lg">Submit Assignment</button>
           </form>
         </section>
       )}

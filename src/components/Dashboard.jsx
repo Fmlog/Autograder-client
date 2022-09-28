@@ -5,12 +5,15 @@ const LMSUrl = "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("accessToken");
 
 /** This component connects the allows the teacher user to
-  * edit assignments in a course fetched from the autograder's server 
-  */
+ * edit assignments in a course fetched from the autograder's server
+ */
 function Dashboard() {
+  document.title = "Dashboard";
+
   const [assignmentList, setAssignmentList] = useState([]);
   const [course, setCourse] = useState([]);
 
+  /** Populates the DOM with courses on load */
   useEffect(() => {
     axios
       .get(LMSUrl + "/course/", {
@@ -27,8 +30,8 @@ function Dashboard() {
   const handleConfig = (e) => {};
 
   /** Handles the deleting of an assignment by sending a DELETE request.
-    * Called on the click of the delete button on the assignment item. 
-    */
+   * Called on the click of the delete button on the assignment item.
+   */
   const handleDelete = (e) => {
     axios
       .delete(LMSUrl + "/course/assignment/" + e.target.value + "/", {
@@ -67,43 +70,35 @@ function Dashboard() {
       </select>
       <ul className="list-group">
         {assignmentList.map((item) => (
-          <li
-            value={item.id}
-            className="list-group-item d-flex justify-content-between"
-          >
-            <div role="button" data-bs-toggle="dropdown">
-              {item.name}
+          <li value={item.id} className="list-group-item">
+            <div className="d-flex justify-content-between">
+              <div
+                role="button"
+                data-bs-toggle="collapse"
+                href={"#card" + item.id}
+                aria-expanded="false"
+                aria-controls={"card" + item.id}
+              >
+                {item.name}
+              </div>
+              <div
+                class="btn-group btn-group-sm"
+                role="group"
+                aria-label="Basic mixed styles example"
+              >
+                <button type="button" class="btn btn-primary" onClick={handleTestcases}>
+                  Edit Testcases
+                </button>
+                <button type="button" class="btn btn-secondary" onClick={handleConfig}>
+                  Edit Config
+                </button>
+                <button value={item.id} type="button" class="btn btn-danger" onClick={handleDelete}>
+                  Delete
+                </button>
+              </div>
             </div>
-            <div class="dropdown-menu p-4 text-muted">
-              <p>{item.description}</p>
-            </div>
-            <div
-              class="btn-group btn-group-sm"
-              role="group"
-              aria-label="Basic mixed styles example"
-            >
-              <button
-                type="button"
-                class="btn btn-primary"
-                onClick={handleTestcases}
-              >
-                Edit Testcases
-              </button>
-              <button
-                type="button"
-                class="btn btn-secondary"
-                onClick={handleConfig}
-              >
-                Edit Config
-              </button>
-              <button
-                value={item.id}
-                type="button"
-                class="btn btn-danger"
-                onClick={handleDelete}
-              >
-                Delete
-              </button>
+            <div class="collapse mt-3" id={"card" + item.id}>
+              <div class="card card-body">{item.description}</div>
             </div>
           </li>
         ))}

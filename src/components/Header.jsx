@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 
+/** The navigation bar of the app */
 function Header() {
   return (
     <div className="">
@@ -43,16 +44,6 @@ function Header() {
                 </a>
                 <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
                   <li>
-                    <Link className="dropdown-item" to="Teacher-login">
-                      Login
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="dropdown-item" to="/register">
-                      Register
-                    </Link>
-                  </li>
-                  <li>
                     <Link className="dropdown-item" to="/dashboard">
                       Dashboard
                     </Link>
@@ -62,12 +53,12 @@ function Header() {
                       Create Assignment
                     </Link>
                   </li>
-                  <li>
-                    <Link className="dropdown-item" to="/logout">
-                      Logout
-                    </Link>
-                  </li>
                 </ul>
+              </li>
+              <li>
+                <Link className="nav-link" to="/logout">
+                  Logout
+                </Link>
               </li>
             </div>
           </div>

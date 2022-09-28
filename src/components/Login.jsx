@@ -3,10 +3,12 @@ import { useRef, useEffect, useState } from "react";
 
 const baseUrl = "http://127.0.0.1:8000/api/login";
 
-/** Component for user authentication. 
- * POST user data to the autograder's server and stores 
+/** Component for user authentication.
+ * POST user data to the autograder's server and stores
  * bearer token on the client for subsequent requests */
 function Login() {
+  document.title = "Login";
+
   const userRef = useRef();
   const errRef = useRef();
   const [login_id, setUser] = useState("");
@@ -18,7 +20,7 @@ function Login() {
   useEffect(() => {
     setErrMsg("");
   }, [login_id, password]);
-  
+
   /** Post user input to server.
    * Called on click of sign in button.
    */
@@ -60,11 +62,7 @@ function Login() {
         </section>
       ) : (
         <section className="container p-4">
-          <p
-            ref={errRef}
-            className={errMsg ? "errmsg" : "offscreen"}
-            aria-live="assertive"
-          >
+          <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
             {errMsg}
           </p>
 
@@ -111,5 +109,5 @@ function Login() {
       )}
     </>
   );
-};
+}
 export default Login;

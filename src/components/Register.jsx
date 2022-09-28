@@ -4,6 +4,8 @@ import { useEffect, useState, useRef } from "react";
 const baseUrl = "http://127.0.0.1:8000/api/register";
 
 function Register() {
+  document.title = "Register";
+
   const errRef = useRef();
 
   const [errMsg, setErrMsg] = useState("");
@@ -14,20 +16,22 @@ function Register() {
     setErrMsg("");
   }, []);
   
-
   const [userData, setUserData] = useState({
     name: "",
     login_id: "",
     password: "",
     role: "",
   });
+
+  /** Sets registration data while user types */
   const handleChange = (event) => {
     setUserData({
       ...userData,
       [event.target.name]: event.target.value,
     });
   };
-  
+
+  /** Send registeration data to autograder server*/
   const submitForm = async () => {
     const userFormData = new FormData();
     userFormData.append("name", userData.name);
@@ -58,9 +62,6 @@ function Register() {
     }
   };
 
-  useEffect(() => {
-    document.title = "Register";
-  });
   return (
     <div>
       {success ? (

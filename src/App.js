@@ -5,8 +5,6 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Dashboard from "./components/Dashboard";
 import Assignment from "./components/Assignment";
-import Test from "./components/Test";
-import Tester from "./components/Tester";
 import Logout from "./components/Logout";
 
 import { Routes, Route } from "react-router-dom";
@@ -23,7 +21,6 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/assignment" element={<Assignment />} />
-        <Route path="/test" element={<Tester />} />
       </Routes>
       <Footer />
     </div>
