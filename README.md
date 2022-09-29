@@ -1,2 +1,2 @@
-# Autograder Web Client
-Work in progress. This client calls
+# Autograder Web App Frontend
+Work in progress.

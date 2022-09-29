@@ -62,7 +62,7 @@ function Home() {
       //Request to autograder
       const response = await axios({
         method: "post",
-        url: graderUrl + "/course/submission",
+        url: graderUrl + "/course/assignment/submission",
         data: formData,
         headers: {
           "Content-Type": "multipart/form-data",

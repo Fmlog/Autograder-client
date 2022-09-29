@@ -1,4 +1,4 @@
-import axios from "../api/axios";
+import axios from "axios";
 import { useRef, useEffect, useState } from "react";
 
 const baseUrl = "http://127.0.0.1:8000/api/login";
@@ -55,10 +55,10 @@ function Login() {
   return (
     <>
       {success ? (
-        <section>
-          <h1 class="text-success p-4">You are logged in!</h1>
+        <section className="container p-4">
+          <h1 class="text-success">You are logged in!</h1>
           <br />
-          <p>{/* <a href="#">Go to Home</a> */}</p>
+          <p>{<a href="/">Go to Home</a>}</p>
         </section>
       ) : (
         <section className="container p-4">
