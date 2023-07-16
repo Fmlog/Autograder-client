@@ -1,7 +1,7 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react';
+import axios from "axios";
+import { useEffect, useState } from "react";
 
-const baseUrl = 'http://127.0.0.1:8000/register/lecturer';
+const baseUrl = "http://127.0.0.1:8000/register/lecturer";
 
 function Register() {
   const [userData, setUserData] = useState({
@@ -9,50 +9,63 @@ function Register() {
     "login_id": "",
     "password": "",
     "is_lecturer": "True",
-    "status": true
+    "status": "success",
   });
   const handleChange = (event) => {
     setUserData({
       ...userData,
-      [event.target.name]: event.target.value
+      [event.target.name]: event.target.value,
     });
-  }
+  };
 
   const submitForm = () => {
     const userFormData = new FormData();
-    userFormData.append("name", userData.name)
-    userFormData.append("login_id", userData.login_id)
-    userFormData.append("password", userData.password)
-    userFormData.append("is_lecturer", userData.is_lecturer)
-    userFormData.append("is_student", userData.is_student)
-    console.log(userFormData)
+    userFormData.append("name", userData.name);
+    userFormData.append("login_id", userData.login_id);
+    userFormData.append("password", userData.password);
+    userFormData.append("is_lecturer", userData.is_lecturer);
     try {
       axios.post(baseUrl, userFormData).then((response) => {
-        console.log(response.data)
-      });
-    } catch (error) {
+        console.log(response.data);
+      })} catch (error) {
       console.log(error);
+      setUserData({ status: "error" });
     }
-    console.log("it works")
   }
   return (
-    <form className='p-4'>
+    <form className="p-4">
+          {userData.status === "success" && <p class="text-success">Registeration successful</p>}
+          {userData.status === "error" && <p class="text-danger">Something went wrong</p>}
       <div className="mb-3">
-        <label for="name" className="form-label">name</label>
-        <input onChange={handleChange} name="name" type="text" className="form-control" id="name" aria-describedby="emailHelp" />
-        <div id="emailHelp" className="form-text">Full  Name not required</div>
+          <label for="name" className="form-label">
+              name
+          </label>
+          <input onChange={handleChange} name="name" type="text" className="form-control" id="name"
+              aria-describedby="emailHelp" />
+          <div id="emailHelp" className="form-text">
+              Full Name not required
+          </div>
       </div>
       <div className="mb-3">
-        <label for="email" className="form-label">Email/Login Id</label>
-        <input onChange={handleChange} name="login_id" type="email" className="form-control" id="email" aria-describedby="emailHelp" />
-        <div id="emailHelp" className="form-text">Authenticate with your LMS instead</div>
+          <label for="email" className="form-label">
+              Email/Login Id
+          </label>
+          <input onChange={handleChange} name="login_id" type="email" className="form-control" id="email"
+              aria-describedby="emailHelp" />
+          <div id="emailHelp" className="form-text">
+              Authenticate with your LMS instead
+          </div>
       </div>
       <div className="mb-3">
-        <label for="password" className="form-label">Password</label>
-        <input onChange={handleChange} name="password" type="password" className="form-control" id="password" />
+          <label for="password" className="form-label">
+              Password
+          </label>
+          <input onChange={handleChange} name="password" type="password" className="form-control" id="password" />
       </div>
-      <button onClick={submitForm} type="submit" className="btn btn-primary mt-4">Register</button>
+      <button onClick={submitForm} type="submit" className="btn btn-primary mt-4">
+          Register
+      </button>
     </form>
-  )
+  );
 }
 export default Register;
